@@ -52,8 +52,6 @@ RUN mkdir -p ~/hdfs/namenode \
 RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
     cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
-RUN hdfs namenode -format
-
 EXPOSE 9870
 EXPOSE 8088
 
