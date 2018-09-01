@@ -20,7 +20,6 @@
 
     <property>
         <name>fs.defaultFS</name>
-<!--        <value>hdfs://ub16043lts00:9820/</value> -->
         <value>hdfs://hadoop-master:9820/</value>
         <description>NameNode URI</description>
     </property>

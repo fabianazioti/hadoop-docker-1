@@ -26,14 +26,12 @@
 
     <property>
       <name>mapreduce.jobhistory.address</name>
-<!--      <value>ub16043lts00:10020</value> -->
       <value>hadoop-master:10020</value> 
       <description>Default port is 10020.</description>
     </property>
 
     <property>
       <name>mapreduce.jobhistory.webapp.address</name>
-<!--      <value>ub16043lts00:19888</value> -->
       <value>hadoop-master:19888</value>
       <description>Default port is 19888.</description>
     </property>
