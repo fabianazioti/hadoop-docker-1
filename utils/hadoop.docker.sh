@@ -6,11 +6,11 @@
 
 HADDOP_SLAVE_NAME="hadoop-slave"
 HADDOP_MASTER_NAME="hadoop-master"
-HADOOP_DOCKER_IMG="vconrado/hadoop_cluster:3.1.1"
-
+HADOOP_DOCKER_IMG="hadoop_cluster:3.1.1"
+HADOOP_DOCKER_BASE_PATH="/tmp/hadoop"
 
 function get_base_path(){
-    echo "/tmp/hadoop"
+    echo $HADOOP_DOCKER_BASE_PATH
 }
 
 function get_online_master(){
@@ -39,6 +39,7 @@ function get_master_urls(){
 }
 
 function docker_inspect_cluster(){
+    # TODO: check if cluster exists
     local CLUSTER_NAME=$1
     # check if CLUSTER_NAME is a valid world
     re='^[a-zA-Z][a-zA-Z0-9]+$'
@@ -50,6 +51,12 @@ function docker_inspect_cluster(){
     local BASE_PATH=$(get_base_path)
     local CLUSTER_PATH=$BASE_PATH/$CLUSTER_NAME
     local MASTER=$(get_online_master $CLUSTER_NAME)
+    
+    if [ ! -d $CLUSTER_PATH ]; then
+        echo "ERROR: '$CLUSTER_PATH' not found."
+        exit 1
+    fi
+    
     
     echo "Cluster ${CLUSTER_NAME} info" 
     echo "CLUSTER_PATH=${CLUSTER_PATH}"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source hadoop.docker.sh
+source ./utils/hadoop.docker.sh
 
 APP_NAME="hadoop-docker.sh"
 
@@ -22,7 +22,7 @@ function cluster_usage(){
     echo "Commands:"
     echo -e "  create\tCreate a hadoop cluster"
     echo -e "  rm\t\tRemove a hadoop cluster"
-    echo -e "  purge\tRemove a hadoop cluster and its config files"
+    echo -e "  purge\t\tRemove a hadoop cluster and its config files"
     echo -e "  inspect\tInspect a hadoop cluster"
     
 }
