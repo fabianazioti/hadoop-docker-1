@@ -26,11 +26,6 @@ if ! [[ $CLUSTER_NAME =~ $re ]] ; then
 fi
 
 
-#echo "Using: "
-#echo " N_NODES=$N_NODES"
-#echo " CLUSTER_NAME=$CLUSTER_NAME"
-#echo " HDFS_BASE_PATH=$HDFS_BASE_PATH"
-
 if [ ! -d $HDFS_BASE_PATH ]; then
     echo "'$HDFS_BASE_PATH' not found."
     exit 1
@@ -59,11 +54,6 @@ else
     
     rm -rf $WORKERS_FILE
     echo "${CLUSTER_NAME}-${HADDOP_MASTER_NAME}" >> $WORKERS_FILE
-    #for i in $(seq 1 $N_NODES); do
-    #    NAME="${CLUSTER_NAME}-${HADDOP_SLAVE_NAME}-$i"
-    #    echo $NAME >> $WORKERS_FILE
-    #done
-
 
     echo "Creating core-site.xml file"
     cp config/core-site.xml $CLUSTER_PATH/config
@@ -113,19 +103,6 @@ docker exec ${CLUSTER_NAME}-${HADDOP_MASTER_NAME} start-yarn.sh
 
 for i in $(seq 1 $N_NODES); do
     add_datanode ${CLUSTER_NAME} $CLUSTER_PATH
-
-#    echo "Starting ${CLUSTER_NAME}-${HADDOP_SLAVE_NAME}-$i"
-#    docker run -itd \
-#        --name "${CLUSTER_NAME}-${HADDOP_SLAVE_NAME}-$i" \
-#        --hostname "${CLUSTER_NAME}-${HADDOP_SLAVE_NAME}-$i" \
-#        --volume "$CLUSTER_PATH/datanode/${CLUSTER_NAME}-${HADDOP_SLAVE_NAME}-$i":/home/hadoopuser/hdfs/datanode \
-#        --net=$NETWORK \
-#        vconrado/hadoop_cluster:3.1.1
-
-#    docker cp $WORKERS_FILE ${CLUSTER_NAME}-${HADDOP_SLAVE_NAME}-$i:/usr/local/hadoop/etc/hadoop/
-#    docker cp $CLUSTER_PATH/config/core-site.xml ${CLUSTER_NAME}-${HADDOP_SLAVE_NAME}-$i:/usr/local/hadoop/etc/hadoop/
-#    docker cp $CLUSTER_PATH/config/mapred-site.xml ${CLUSTER_NAME}-${HADDOP_SLAVE_NAME}-$i:/usr/local/hadoop/etc/hadoop/
-    
 done
 
             

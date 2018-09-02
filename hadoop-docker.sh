@@ -1,0 +1,218 @@
+#!/bin/bash
+
+source hadoop.docker.sh
+
+APP_NAME="hadoop-docker.sh"
+
+function usage(){
+    echo "Usage: ${APP_NAME} COMMAND [OPTIONS]"
+    echo
+    echo "Management Commands:"
+    echo -e "  cluster\tManage hadoop cluster"
+    echo -e "  datanode\tManage hadoop datanode"
+}
+
+####################### cluster ############################
+
+function cluster_usage(){
+    echo "Usage: ${APP_NAME} cluster COMMAND [OPTIONS]"
+    echo
+    echo "Manage hadoop cluster"
+    echo
+    echo "Commands:"
+    echo -e "  create\tCreate a hadoop cluster"
+    echo -e "  rm\t\tRemove a hadoop cluster"
+    echo -e "  purge\tRemove a hadoop cluster and its config files"
+    echo -e "  inspect\tInspect a hadoop cluster"
+    
+}
+
+function cluster(){
+    if [ $# -lt 1 ]; then
+      cluster_usage
+      exit 1
+    fi
+
+    COMMAND=$1
+    case "$COMMAND" in
+        ("create") cluster_create "${@:2}" ;;
+        ("rm") cluster_rm "${@:2}" ;;
+        ("purge") cluster_purge "${@:2}" ;;
+        ("inspect") cluster_inspect "${@:2}" ;;
+        (*) cluster_usage ;;
+    esac
+
+}
+
+function cluster_create(){
+    if [ $# -lt 1 ]; then
+        echo "\"${APP_NAME} cluster create\" requires at least 1 argument."
+        echo
+        echo "Usage: ${APP_NAME} cluster create CLUSTER_NAME [N_DATANODES]"
+        echo
+        exit 1
+    fi
+    
+    CLUSTER_NAME=$1
+    N_NODES=${2:-0}
+    
+    # check if CLUSTER_NAME is a valid world
+    re='^[a-zA-Z][a-zA-Z0-9]+$'
+    if ! [[ $CLUSTER_NAME =~ $re ]] ; then
+       echo "ERROR: '$CLUSTER_NAME' is not a valid CLUSTER NAME."
+       exit 1
+    fi
+ 
+    # check if N_NODES is a valid integer
+    re='^[0-9]+$'
+    if ! [[ $N_NODES =~ $re ]] ; then
+       echo "ERROR: '$N_NODES' is not a valid number."
+       exit 1
+    fi
+    
+    docker_create_cluster $CLUSTER_NAME $N_NODES
+
+    echo
+    get_master_urls $CLUSTER_NAME
+}
+
+function cluster_rm(){
+    if [ $# -lt 1 ]; then
+        echo "\"${APP_NAME} cluster rm\" requires exactly 1 argument."
+        echo
+        echo "Usage: ${APP_NAME} cluster rm CLUSTER_NAME"
+        echo
+        exit 1
+    fi
+    
+    CLUSTER_NAME=$1
+    # check if CLUSTER_NAME is a valid world
+    re='^[a-zA-Z][a-zA-Z0-9]+$'
+    if ! [[ $CLUSTER_NAME =~ $re ]] ; then
+       echo "ERROR: '$CLUSTER_NAME' is not a valid CLUSTER NAME."
+       exit 1
+    fi
+    
+    docker_rm_cluster $CLUSTER_NAME
+}
+
+
+function cluster_purge(){
+    if [ $# -lt 1 ]; then
+        echo "\"${APP_NAME} cluster purge\" requires exactly 1 argument."
+        echo
+        echo "Usage: ${APP_NAME} cluster purge CLUSTER_NAME"
+        echo
+        exit 1
+    fi
+    
+    CLUSTER_NAME=$1
+    docker_purge_cluster $CLUSTER_NAME
+    
+}
+
+function cluster_inspect(){
+    if [ $# -lt 1 ]; then
+        echo "\"${APP_NAME} cluster inspect\" requires exactly 1 argument."
+        echo
+        echo "Usage: ${APP_NAME} cluster inspect CLUSTER_NAME"
+        echo
+        exit 1
+    fi
+    
+    CLUSTER_NAME=$1
+    # check if CLUSTER_NAME is a valid world
+    re='^[a-zA-Z][a-zA-Z0-9]+$'
+    if ! [[ $CLUSTER_NAME =~ $re ]] ; then
+       echo "ERROR: '$CLUSTER_NAME' is not a valid CLUSTER NAME."
+       exit 1
+    fi
+    
+    docker_inspect_cluster $CLUSTER_NAME
+}
+
+
+####################### datanode ############################
+
+function datanode_usage(){
+    echo "Usage: ${APP_NAME} datanode COMMAND [OPTIONS]"
+    echo
+    echo "Manage hadoop cluster datanode"
+    echo
+    echo "Commands:"
+    echo -e "  add\t\tAdd a datanode to a hadoop cluster"
+    echo -e "  rm\t\tRemove a datanode from a hadoop cluster"
+    echo -e "  readd\t\tRe-add a datanode to a hadoop cluster"
+}
+
+function datanode(){
+    if [ $# -lt 1 ]; then
+      datanode_usage
+      exit 1
+    fi
+    
+    COMMAND=$1
+    case "$COMMAND" in
+        ("add") datanode_add "${@:2}" ;;
+        ("rm") datanode_rm "${@:2}" ;;
+        ("readd") datanode_readd "${@:2}" ;;
+        (*) datanode_usage ;;
+    esac
+}
+
+
+function datanode_add(){
+    if [ $# -lt 1 ]; then
+        echo "\"${APP_NAME} datanode add\" requires at least 1 argument."
+        echo
+        echo "Usage: ${APP_NAME} datanode add CLUSTER_NAME [N_DATANODES]"
+        echo
+        exit 1
+    fi
+    CLUSTER_NAME=$1
+    N=${2:-1}
+    for i in $(seq 1 $N); do
+        docker_add_datanode $CLUSTER_NAME
+    done
+}
+
+function datanode_rm(){
+    if [ $# -lt 2 ]; then
+        echo "\"${APP_NAME} datanode rm\" requires exactly 2 arguments."
+        echo
+        echo "Usage: ${APP_NAME} datanode rm CLUSTER_NAME DATANODE_ID"
+        echo
+        exit 1
+    fi
+    local CLUSTER_NAME=$1
+    local DATANODE_ID=$2
+    docker_rm_datanode $CLUSTER_NAME $DATANODE_ID
+}
+
+function datanode_readd(){
+    if [ $# -lt 2 ]; then
+        echo "\"${APP_NAME} datanode readd\" requires exactly 2 arguments."
+        echo
+        echo "Usage: ${APP_NAME} datanode readd CLUSTER_NAME DATANODE_ID"
+        echo
+        exit 1
+    fi
+    local CLUSTER_NAME=$1
+    local DATANODE_ID=$2
+    docker_readd_datanode $CLUSTER_NAME $DATANODE_ID
+}
+
+####################### main ############################
+if [ $# -lt 1 ]; then
+  usage
+  exit 1
+fi
+
+COMMAND=$1
+
+case "$COMMAND" in
+    ("cluster") cluster "${@:2}" ;;
+    ("datanode") datanode "${@:2}" ;;
+    (*) echo usage ;;
+esac
+

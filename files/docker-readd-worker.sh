@@ -5,7 +5,10 @@ if [ $# -lt 1 ]; then
 	exit 1
 fi
 
-echo $1 >> /usr/local/hadoop/etc/hadoop/dfs.exclude
+#echo $1 >> 
+
+grep -v $1 /usr/local/hadoop/etc/hadoop/dfs.exclude > /usr/local/hadoop/etc/hadoop/dfs.exclude.tmp
+mv /usr/local/hadoop/etc/hadoop/dfs.exclude.tmp /usr/local/hadoop/etc/hadoop/dfs.exclude
 
 hdfs dfsadmin -refreshNodes
 

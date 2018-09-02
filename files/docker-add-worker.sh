@@ -7,4 +7,4 @@ fi
 
 echo $1 >> $HADOOP_INSTALL/etc/hadoop/workers
 
-cat $HADOOP_INSTALL/etc/hadoop/workers
+#cat $HADOOP_INSTALL/etc/hadoop/workers
