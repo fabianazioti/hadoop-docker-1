@@ -53,4 +53,10 @@
         <name>dfs.namenode.datanode.registration.ip-hostname-check</name>
         <value>false</value>
     </property>
+    
+    <property>
+        <name>dfs.hosts.exclude</name>
+        <value>/usr/local/hadoop/etc/hadoop/dfs.exclude</value>
+    </property>
+    
 </configuration>

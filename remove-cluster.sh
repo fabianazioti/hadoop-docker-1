@@ -7,7 +7,7 @@ fi
 
 CLUSTER_NAME=$1
 
-for c in $(docker ps --format '{{.Names}}' | grep ^"$CLUSTER_NAME-hadoop"); do 
+for c in $(docker ps --format '{{.Names}}' | grep ^"$CLUSTER_NAME-hadoop" | sort); do 
     echo "Stopping/Removing $c"
     docker stop $c
     docker rm -v $c

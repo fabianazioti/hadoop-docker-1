@@ -47,5 +47,10 @@
       <value>/mr-history/done</value>
       <description>Directory where history files are managed by the MR JobHistory Server.</description>
     </property> 
+    
+    <property>
+        <name>mapreduce.jobtracker.hosts.exclude.filename</name>
+        <value>/usr/local/hadoop/etc/hadoop/dfs.exclude</value>
+    </property>
 
 </configuration>
