@@ -8,6 +8,7 @@ HADDOP_SLAVE_NAME="hadoop-slave"
 HADDOP_MASTER_NAME="hadoop-master"
 HADOOP_DOCKER_IMG="hadoop_cluster:3.1.1"
 HADOOP_DOCKER_BASE_PATH="/tmp/hadoop"
+HADOOP_CLUSTER_CONF_PATH="docker/hadoop_cluster/"
 
 HADOOP_DOCKER_CONFIG_FILE="/home/$USER/.hadoop-docker.conf"
 if [ -f $HADOOP_DOCKER_CONFIG_FILE ]; then
@@ -143,18 +144,18 @@ function docker_create_cluster(){
     echo "${CLUSTER_NAME}-${HADDOP_MASTER_NAME}" >> $WORKERS_FILE
 
     echo "Creating core-site.xml file"
-    cp config/core-site.xml $CLUSTER_PATH/config
+    cp $HADOOP_CLUSTER_CONF_PATH/config/core-site.xml $CLUSTER_PATH/config
     sed -i "s/hadoop-master/${CLUSTER_NAME}-hadoop-master/g" $CLUSTER_PATH/config/core-site.xml
 
     echo "Creating mapred-site.xml file"
-    cp config/mapred-site.xml $CLUSTER_PATH/config
+    cp $HADOOP_CLUSTER_CONF_PATH/config/mapred-site.xml $CLUSTER_PATH/config
     sed -i "s/hadoop-master/${CLUSTER_NAME}-hadoop-master/g" $CLUSTER_PATH/config/mapred-site.xml
     
     echo "Creating dfs.exclude file"
-    cp config/dfs.exclude $CLUSTER_PATH/config
+    cp $HADOOP_CLUSTER_CONF_PATH/config/dfs.exclude $CLUSTER_PATH/config
     
     echo "Creating hdfs-site.xml file"
-    cp config/hdfs-site.xml $CLUSTER_PATH/config
+    cp $HADOOP_CLUSTER_CONF_PATH/config/hdfs-site.xml $CLUSTER_PATH/config
     
 
     local NETWORK="${CLUSTER_NAME}-hadoop-net"
@@ -171,9 +172,9 @@ function docker_create_cluster(){
         ${HADOOP_DOCKER_IMG}
 
 
-    docker cp files/docker-add-worker.sh ${CLUSTER_NAME}-${HADDOP_MASTER_NAME}:/home/hadoopuser
-    docker cp files/docker-rm-worker.sh ${CLUSTER_NAME}-${HADDOP_MASTER_NAME}:/home/hadoopuser
-    docker cp files/docker-readd-worker.sh ${CLUSTER_NAME}-${HADDOP_MASTER_NAME}:/home/hadoopuser
+    docker cp $HADOOP_CLUSTER_CONF_PATH/files/docker-add-worker.sh ${CLUSTER_NAME}-${HADDOP_MASTER_NAME}:/home/hadoopuser
+    docker cp $HADOOP_CLUSTER_CONF_PATH/files/docker-rm-worker.sh ${CLUSTER_NAME}-${HADDOP_MASTER_NAME}:/home/hadoopuser
+    docker cp $HADOOP_CLUSTER_CONF_PATH/files/docker-readd-worker.sh ${CLUSTER_NAME}-${HADDOP_MASTER_NAME}:/home/hadoopuser
 
     docker cp $WORKERS_FILE ${CLUSTER_NAME}-${HADDOP_MASTER_NAME}:/usr/local/hadoop/etc/hadoop/
     docker cp $CLUSTER_PATH/config/core-site.xml ${CLUSTER_NAME}-${HADDOP_MASTER_NAME}:/usr/local/hadoop/etc/hadoop/
