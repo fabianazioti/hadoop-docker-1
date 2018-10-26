@@ -9,7 +9,19 @@ HADDOP_MASTER_NAME="hadoop-master"
 HADOOP_DOCKER_IMG="hadoop_cluster:3.1.1"
 HADOOP_DOCKER_BASE_PATH="/tmp/hadoop"
 
+HADOOP_DOCKER_CONFIG_FILE="/home/$USER/.hadoop-docker.conf"
+if [ -f $HADOOP_DOCKER_CONFIG_FILE ]; then
+    source $HADOOP_DOCKER_CONFIG_FILE
+fi
+
 function get_base_path(){
+    if [ ! -d $HADOOP_DOCKER_BASE_PATH ]; then
+        >&2 echo "Criando docker bash path $HADOOP_DOCKER_BASE_PATH."
+        mkdir -p $HADOOP_DOCKER_BASE_PATH
+        if [[ $? -ne 0 ]]; then
+            >&2 echo "Nao consegui criar o diretório :("
+        fi
+    fi
     echo $HADOOP_DOCKER_BASE_PATH
 }
 
